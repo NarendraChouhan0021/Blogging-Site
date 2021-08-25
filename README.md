@@ -3,7 +3,7 @@
 ## Nodejs With MYSql db
 
 ## Project setup
-#### create the db ```blogs``` name
+#### create the db with name ```blogs``` in your MYSQL
 
 ### Run Server Side
 
