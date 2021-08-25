@@ -17,13 +17,9 @@ app.use(express.static(__dirname));
 
 app.use("/blog", require("./startup/routes"));
 
-/* Restiction router */
-// app.all("*", (req, res) => res.status(404).send(`Access denied`));
-
-
-// Connection with db.
+/*  Connection with db. */
 models.sequelize
-  .sync({ force: true })
+  .sync()
   .then(() =>
     app.listen(PORT, () =>
       console.log(message, "\nConnection has been established successfully.")
