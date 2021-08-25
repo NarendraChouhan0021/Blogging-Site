@@ -42,7 +42,6 @@ exports.create = async (req, res) => {
       res.status(200).send(res_data);
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send({
       message: err.message || "Some error occurred while creating the Blog.",
       success: 0,
@@ -55,8 +54,6 @@ exports.findAll = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.page_size) || 10;
-    console.log("pageSize", pageSize)
-    console.log("page", page)
 
     let findQuery = {};
     const collectCommects = [];
@@ -100,7 +97,6 @@ exports.findAll = async (req, res) => {
 
         data.rows[i]["images"] = image;
         for (let j in comment) {
-          console.log("comment[j]", comment[j]["dataValues"]);
           collectCommects.push({
             ...comment[j]["dataValues"],
           });

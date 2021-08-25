@@ -19,7 +19,7 @@ app.use("/blog", require("./startup/routes"));
 
 /*  Connection with db. */
 models.sequelize
-  .sync()
+  .sync({ force: true })
   .then(() =>
     app.listen(PORT, () =>
       console.log(message, "\nConnection has been established successfully.")

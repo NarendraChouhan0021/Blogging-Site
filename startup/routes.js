@@ -14,8 +14,7 @@ const auth = async (req, res, next) => {
     req.user = data;
     next();
   } catch (error) {
-    console.log(error);
-    res.status(400).send("Not a valid user.");
+    res.status(400).send("Not a valid user. err:" + error);
   }
 };
 

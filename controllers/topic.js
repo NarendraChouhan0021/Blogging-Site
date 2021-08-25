@@ -40,8 +40,6 @@ exports.findAll = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.page_size) || 10;
-    console.log("pageSize", pageSize)
-    console.log("page", page)
     let findQuery = {};
 
     if (page || pageSize) {

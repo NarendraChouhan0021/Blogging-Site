@@ -3,7 +3,7 @@ const blogs = db.blogs;
 const comments = db.comments;
 const Images = db.images;
 
- /* add a new comment on post */
+/* add a new comment on post */
 exports.create = async (req, res) => {
   try {
     if (!req.body || !Object.keys(req.body).length) {
@@ -69,9 +69,8 @@ exports.findOne = async (req, res) => {
       res.send({});
     }
   } catch (err) {
-    console.log(err);
     res.status(500).send({
-      message: "Error retrieving comment.",
+      message: "Error retrieving comment." + err,
     });
   }
 };
