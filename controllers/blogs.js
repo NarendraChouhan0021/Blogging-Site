@@ -43,7 +43,7 @@ exports.create = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      message: err.message || "Some error occurred while creating the Blog.",
+      message: "Some error occurred while creating the Blog. Topic Id is incorrect ",
       success: 0,
     });
   }
@@ -111,7 +111,7 @@ exports.findAll = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      message: err.message || "Some error occurred while retrieving blogs.",
+      message: "Some error occurred while retrieving blogs.",
     });
   }
 };
