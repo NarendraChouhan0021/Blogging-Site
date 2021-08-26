@@ -11,6 +11,7 @@ const auth = async (req, res, next) => {
   try {
     const token = req.header("Authorization").replace("Bearer ", "");
     const data = jwt.verify(token, 'Blogging?222At@'); /* hardcoded the value for temp */
+    if (!data) throw new Error()
     const user = await User.findByPk(data.user.id)
     if (!user) throw new Error("user token is not valid");
     req.user = data;
