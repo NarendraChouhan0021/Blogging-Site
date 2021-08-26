@@ -15,11 +15,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
 
-app.use("/blog", require("./startup/routes"));
-
 /*  Connection with db. */
 models.sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() =>
     app.listen(PORT, () =>
       console.log(message, "\nConnection has been established successfully.")
