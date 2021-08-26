@@ -56,7 +56,6 @@ exports.findAll = async (req, res) => {
     const pageSize = parseInt(req.query.page_size) || 10;
 
     let findQuery = {};
-    const collectCommects = [];
 
     if (page && pageSize) {
       findQuery = {
@@ -70,6 +69,7 @@ exports.findAll = async (req, res) => {
 
     if (data && data.rows) {
       for (let i in data.rows) {
+        const collectCommects = [];
         data.rows[i] = data.rows[i]["dataValues"];
         const topices = await topic.findOne({
           where: { id: data.rows[i]["topic_id"] },
