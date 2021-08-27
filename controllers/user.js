@@ -1,8 +1,10 @@
-const db = require("../models");
-const User = db.users;
+// const db = require("../models");
+// const User = db.users;
 const nodemailer = require("nodemailer");
-const jwt = require("jsonwebtoken");
+// const jwt = require("jsonwebtoken");
 const mg = require("nodemailer-mailgun-transport");
+const { userCreate, userAuth } = require("../service/user");
+const { validate } = require("../middleware");
 
 /* Create and save new user */
 exports.create = async (req, res) => {
@@ -14,35 +16,53 @@ exports.create = async (req, res) => {
       return;
     }
 
-    /* check email existence */
-    const is_email_exist = await User.findOne({
-      where: { email: req.body.email },
-    });
-    if (is_email_exist) {
-      res.status(409).send({
-        message: "Email already exist!!",
-        success: 0,
-      });
-      return;
-    }
+    const email = req.body.email;
+    const password = req.body.password;
+    const first_name = req.body.first_name;
+    const last_name = req.body.last_name;
+    const phone = req.body.phone;
 
     /* Create a User */
     const user = {
-      email: req.body.email,
-      password: req.body.password,
-      username: req.body.email,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      phone: req.body.phone,
+      email,
+      password,
+      username: email,
+      first_name,
+      last_name,
+      phone,
     };
 
-    /* Save User in the database */
-    let data = await User.create(user);
+    const required = {
+      email,
+      password,
+      first_name,
+      last_name,
+      phone,
+    };
+
+    const validationIssue = validate(req, res, required);
+    console.log("validationIssue", validationIssue)
+    if (validationIssue) {
+    return  res.status(500).send({
+        message: validationIssue,
+      });
+    }
+
+    const { is_email_exist, data } = await userCreate(user);
+
+    if (is_email_exist) {
+      return res.status(409).send({
+        message: "Email already exist!!",
+        success: 0,
+      });
+    }
 
     if (data) {
       let res_data = {};
-      const email = data.email;
-      const mail_sent = await sendMail(`Welcome to the Blogging Website.`, email);
+      const mail_sent = await sendMail(
+        `Welcome to the Blogging Website.`,
+        data.email
+      );
 
       if (mail_sent) {
         res_data = {
@@ -70,50 +90,31 @@ exports.create = async (req, res) => {
 /* Authenticate user credentials */
 exports.authentication = async (req, res) => {
   try {
-    if (req.body.email === "" || req.body.password === "") {
+    const email = req.body.email;
+    const password = req.body.password;
+    if (email === "" || password === "") {
       res.status(400).send({
         message: "Content can not be empty!",
         success: 0,
       });
       return;
     }
+    const { is_valid_cred, data } = await userAuth(email, password);
 
-    const user = await User.findOne({
-      where: { email: req.body.email },
-    });
-
-    if (user) {
-      const user_pass = req.body.password;
-      const stored_pass = user.password;
-      const is_valid_pwd = user_pass === stored_pass ? true : false;
-
-      if (!is_valid_pwd) {
-        res.status(404).send({
-          message: "Invalid Credentials!",
-          success: 0,
-        });
-        return;
-      }
-
-      const body = { id: user.id, };
-      const token = jwt.sign({ user: body }, "Blogging?222At@");
-      const data = { token: token, success: 1 };
-
-      res.status(200).send(data);
-    } else {
-      res.status(404).send({
+    if (!is_valid_cred) {
+      return res.status(404).send({
         message: "Invalid Credentials!",
         success: 0,
       });
-      return;
     }
+
+    return res.status(200).send(data);
   } catch (err) {
     res.status(500).send({
       message: err.message || "Error occurred while user authentication.",
     });
   }
 };
-
 
 const sendMail = async (title, email) => {
   return new Promise((resolve, reject) => {
@@ -141,4 +142,4 @@ const sendMail = async (title, email) => {
       }
     });
   });
-}
+};

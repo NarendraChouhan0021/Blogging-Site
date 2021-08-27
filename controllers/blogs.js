@@ -1,10 +1,5 @@
-const db = require("../models");
-const blogs = db.blogs;
-const comments = db.comments;
-const topic = db.topics;
-const Sequelize = db.Sequelize;
-const Op = Sequelize.Op;
-const Images = db.images;
+const { createBlog, getAllBlogs } = require("../service/blogs");
+const { validate } = require("../middleware");
 
 /* Create new Blog */
 exports.create = async (req, res) => {
@@ -16,24 +11,27 @@ exports.create = async (req, res) => {
       return;
     }
 
-    const images = [];
     const blog = {
       title: req.body.title,
       description: req.body.description,
       topic_id: req.body.topic_id,
-      created_by: req.user.user.id,
     };
+    console.log("validationIssue", blog)
 
-    /*  Save blog in the database */
-    const { dataValues } = await blogs.create(blog);
-    if (req.files) {
-      for (let file of req.files) {
-        images.push({ main: file.path, blog_id: dataValues.id });
-      }
-      await Images.bulkCreate(images);
+
+
+    const validationIssue = validate(req, res, blog);
+    console.log("validationIssue", validationIssue)
+    if (validationIssue) {
+      return res.status(500).send({
+        message: validationIssue,
+      });
     }
 
-    if (dataValues) {
+    blog.created_by = req.user.user.id;
+    const data = await createBlog(blog);
+
+    if (data) {
       const res_data = {
         msg: `Blog posted successfully.`,
         action: "add",
@@ -43,7 +41,8 @@ exports.create = async (req, res) => {
     }
   } catch (err) {
     res.status(500).send({
-      message: "Some error occurred while creating the Blog. Topic Id is incorrect ",
+      message:
+        "Some error occurred while creating the Blog. Topic Id is incorrect ",
       success: 0,
     });
   }
@@ -55,58 +54,10 @@ exports.findAll = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const pageSize = parseInt(req.query.page_size) || 10;
 
-    let findQuery = {};
-
-    if (page && pageSize) {
-      findQuery = {
-        ...findQuery,
-        limit: parseInt(pageSize),
-        offset: (parseInt(page) - 1) * parseInt(pageSize),
-      };
-    }
-
-    const data = await blogs.findAndCountAll(findQuery);
-
-    if (data && data.rows) {
-      for (let i in data.rows) {
-        const collectCommects = [];
-        data.rows[i] = data.rows[i]["dataValues"];
-        const topices = await topic.findOne({
-          where: { id: data.rows[i]["topic_id"] },
-          attributes: {
-            exclude: ["createdAt", "updatedAt"],
-          },
-        });
-        delete data.rows[i]["topic_id"];
-        data.rows[i]["topic"] = topices["dataValues"];
-
-
-        const comment = await comments.findAll({
-          where: { blog_id: data.rows[i]["id"] },
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "blog_id"],
-          },
-        });
-
-        const image = await Images.findAll({
-          where: { blog_id: data.rows[i]["id"] },
-          attributes: {
-            exclude: ["createdAt", "updatedAt", "blog_id", "id"],
-          },
-        });
-
-        data.rows[i]["images"] = image;
-        for (let j in comment) {
-          collectCommects.push({
-            ...comment[j]["dataValues"],
-          });
-        }
-        data.rows[i]["comments"] = collectCommects;
-      }
-    }
+    const data = await getAllBlogs(page, pageSize);
 
     if (data) {
-      data.count = data.rows && data.rows.length ? data.rows.length : 0
+      data.count = data.rows && data.rows.length ? data.rows.length : 0;
       res.status(200).send(data);
     }
   } catch (err) {

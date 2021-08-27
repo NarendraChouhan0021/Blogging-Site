@@ -1,7 +1,8 @@
-const db = require("../models");
-const blogs = db.blogs;
-const comments = db.comments;
-const Images = db.images;
+// const db = require("../models");
+// const blogs = db.blogs;
+// const comments = db.comments;
+// const Images = db.images;
+const { createComment, findByCommentId } = require("../service/comments");
 
 /* add a new comment on post */
 exports.create = async (req, res) => {
@@ -17,7 +18,7 @@ exports.create = async (req, res) => {
       blog_id: req.body.blog_id,
       commented_by: req.user.user.id,
     };
-    const data = await comments.create(comment);
+    const data = await createComment(comment);
 
     if (data) {
       const res_data = {
@@ -40,31 +41,9 @@ exports.create = async (req, res) => {
 exports.findOne = async (req, res) => {
   try {
     const id = req.params.id;
-    const data = await comments.findOne({ where: { id: id } });
-
-    let propertyList = data;
-    propertyList = propertyList["dataValues"];
-
-    const blog = await blogs.findAll({
-      where: { id: propertyList["blog_id"] },
-      attributes: {
-        exclude: ["createdAt", "updatedAt"],
-      },
-    });
-    propertyList["blog"] = blog;
-
-    const image = await Images.findAll({
-      where: { blog_id: propertyList["blog_id"] },
-      attributes: {
-        exclude: ["createdAt", "updatedAt", "blog_id", "id"],
-      },
-    });
-    propertyList["images"] = image;
-
-    delete propertyList["blog_id"];
-
-    if (propertyList) {
-      res.send(propertyList);
+    const data = await findByCommentId(id);
+    if (data) {
+      res.send(data);
     } else {
       res.send({});
     }

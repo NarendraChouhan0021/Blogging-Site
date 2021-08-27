@@ -1,9 +1,9 @@
-module.exports = {
+const config = {
   development: {
-    username: "root",
-    password: "password",
-    database: "blogs",
-    host: "127.0.0.1",
+    username: process.env.DEV_DB_USER || "root",
+    password: process.env.DEV_DB_PASS || "password",
+    database: process.env.DEV_DB_NAME || "blogs",
+    host: process.env.DEV_DB_HOST || "localhost",
     dialect: "mysql",
     charset: "utf8mb4",
     collate: "utf8mb4_unicode_ci",
@@ -15,12 +15,14 @@ module.exports = {
     },
   },
   production: {
-    username: "root",
-    password: null,
-    database: "database_production",
-    host: "127.0.0.1",
+    username: process.env.PROD_DB_USER,
+    password: process.env.PROD_DB_PASS,
+    database: process.env.PROD_DB_NAME,
+    host: process.env.PROD_DB_HOST,
     dialect: "mysql",
     charset: "utf8mb4",
     collate: "utf8mb4_unicode_ci",
   },
 };
+
+module.exports = config;

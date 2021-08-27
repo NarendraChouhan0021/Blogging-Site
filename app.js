@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require("express");
 const morgan = require("morgan");
 const models = require("./models");
+const expressValidator = require("express-validator");
 
 /* PORT assign */
 const PORT = process.env.PORT || 8080;
@@ -15,9 +17,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
 
+/* express-validator */
+app.use(
+  expressValidator({
+    errorFormatter: function (param, msg, value) {
+      let namespace = param.split("."),
+        root = namespace.shift(),
+        formParam = root;
+      while (namespace.length) {
+        formParam += "[" + namespace.shift() + "]";
+      }
+      return msg;
+    },
+  })
+);
+
 /*  Connection with db. */
 models.sequelize
-  .sync({ force: false })
+  .sync()
   .then(() =>
     app.listen(PORT, () =>
       console.log(message, "\nConnection has been established successfully.")
