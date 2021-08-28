@@ -1,9 +1,9 @@
 const config = {
   development: {
-    username: process.env.DEV_DB_USER || "root",
-    password: process.env.DEV_DB_PASS || "password",
-    database: process.env.DEV_DB_NAME || "blogs",
-    host: process.env.DEV_DB_HOST || "localhost",
+    username: process.env.DEV_DB_USER,
+    password: process.env.DEV_DB_PASS,
+    database: process.env.DEV_DB_NAME,
+    host: process.env.DEV_DB_HOST,
     dialect: "mysql",
     charset: "utf8mb4",
     collate: "utf8mb4_unicode_ci",

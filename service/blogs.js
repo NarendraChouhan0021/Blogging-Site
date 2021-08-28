@@ -1,5 +1,4 @@
-const { comments, topics, images, blogs, Sequelize } = require("../models");
-// const Op = Sequelize.Op;
+const { comments, topics, images, blogs } = require("../models");
 
 const createBlog = async (data) => {
   const images = [];
