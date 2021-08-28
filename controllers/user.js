@@ -1,7 +1,4 @@
-// const db = require("../models");
-// const User = db.users;
 const nodemailer = require("nodemailer");
-// const jwt = require("jsonwebtoken");
 const mg = require("nodemailer-mailgun-transport");
 const { userCreate, userAuth } = require("../service/user");
 const { validate } = require("../middleware");
@@ -16,34 +13,19 @@ exports.create = async (req, res) => {
       return;
     }
 
-    const email = req.body.email;
-    const password = req.body.password;
-    const first_name = req.body.first_name;
-    const last_name = req.body.last_name;
-    const phone = req.body.phone;
-
     /* Create a User */
     const user = {
-      email,
-      password,
-      username: email,
-      first_name,
-      last_name,
-      phone,
+      email : req.body.email,
+     password : req.body.passwordemail,
+     first_name : req.body.first_nameemail,
+     last_name : req.body.last_nameemail,
+     phone : req.body.phoneemail,
     };
 
-    const required = {
-      email,
-      password,
-      first_name,
-      last_name,
-      phone,
-    };
-
-    const validationIssue = validate(req, res, required);
+    const validationIssue = validate(req, res, user);
     console.log("validationIssue", validationIssue)
     if (validationIssue) {
-    return  res.status(500).send({
+      return res.status(500).send({
         message: validationIssue,
       });
     }
@@ -118,19 +100,20 @@ exports.authentication = async (req, res) => {
 
 const sendMail = async (title, email) => {
   return new Promise((resolve, reject) => {
+    console.log("process.env.DEV_MAIL_API_KEY",process.env.DEV_MAIL_API_KEY)
     const mailgunAuth = {
       auth: {
-        api_key: "key-a65d852e41a887b7eb01aea2195d612e",
-        domain: "mg.mycondopark.com",
+        api_key: process.env.DEV_MAIL_API_KEY,
+        domain: process.env.DEV_MAIL_DOMAIN,
       },
     };
 
     const smtpTransport = nodemailer.createTransport(mg(mailgunAuth));
 
     const mailOptions = {
-      from: "nikuchouhan4all@gmail.com",
+      from: process.env.DEV_FROM_EMAIL,
       to: email,
-      subject: "Credential For Blogpost",
+      subject: "Welcome to Blogging Site",
       text: title,
     };
 

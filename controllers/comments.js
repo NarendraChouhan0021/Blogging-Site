@@ -1,8 +1,5 @@
-// const db = require("../models");
-// const blogs = db.blogs;
-// const comments = db.comments;
-// const Images = db.images;
 const { createComment, findByCommentId } = require("../service/comments");
+const { validate } = require("../middleware");
 
 /* add a new comment on post */
 exports.create = async (req, res) => {
@@ -15,9 +12,18 @@ exports.create = async (req, res) => {
     }
     const comment = {
       comment: req.body.comment,
-      blog_id: req.body.blog_id,
-      commented_by: req.user.user.id,
+      blog_id: req.body.blog_id
     };
+
+    const validationIssue = validate(req, res, comment);
+
+    if (validationIssue) {
+      return res.status(500).send({
+        message: validationIssue,
+      });
+    }
+
+    comment.commented_by = req.user.user.id
     const data = await createComment(comment);
 
     if (data) {
@@ -41,6 +47,14 @@ exports.create = async (req, res) => {
 exports.findOne = async (req, res) => {
   try {
     const id = req.params.id;
+    if (!id) {
+      res.status(400).send({
+        message: "Id can not be empty!",
+        success: 0,
+      });
+      return;
+    }
+    
     const data = await findByCommentId(id);
     if (data) {
       res.send(data);

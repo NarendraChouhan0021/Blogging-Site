@@ -5,6 +5,11 @@
 ## Project setup
 #### create the db with name ```blogs``` in your MYSQL
 
+#### migrate table 
+```
+npx sequelize-cli db:migrate
+```
+
 ### Run Server Side
 
 ```

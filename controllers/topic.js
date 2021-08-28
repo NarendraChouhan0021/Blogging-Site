@@ -1,6 +1,5 @@
-// const db = require("../models");
-// const Topics = db.topics;
 const { createTopic, findAllTopices, findTopicById } = require("../service/topic");
+const { validate } = require("../middleware");
 
 /* create topic */
 exports.create = async (req, res) => {
@@ -10,7 +9,7 @@ exports.create = async (req, res) => {
       return;
     }
 
-    const Topic = {
+    const topic = {
       topic_name: req.body.topic_name,
       created_by: req.user.user.id,
       updated_by: req.user.user.id,
@@ -18,7 +17,15 @@ exports.create = async (req, res) => {
       updated_at: Date.now(),
     };
 
-    const data = await createTopic(Topic);
+    const validationIssue = validate(req, res, { topic_name: topic.topic_name });
+
+    if (validationIssue) {
+      return res.status(500).send({
+        message: validationIssue,
+      });
+    }
+
+    const data = await createTopic(topic);
 
     if (data) {
       const res_data = {

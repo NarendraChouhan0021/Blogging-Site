@@ -16,12 +16,9 @@ exports.create = async (req, res) => {
       description: req.body.description,
       topic_id: req.body.topic_id,
     };
-    console.log("validationIssue", blog)
-
-
 
     const validationIssue = validate(req, res, blog);
-    console.log("validationIssue", validationIssue)
+    
     if (validationIssue) {
       return res.status(500).send({
         message: validationIssue,
