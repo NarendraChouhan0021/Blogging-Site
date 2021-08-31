@@ -15,11 +15,11 @@ exports.create = async (req, res) => {
 
     /* Create a User */
     const user = {
-      email : req.body.email,
-     password : req.body.passwordemail,
-     first_name : req.body.first_nameemail,
-     last_name : req.body.last_nameemail,
-     phone : req.body.phoneemail,
+      email: req.body.email,
+      password: req.body.password,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      phone: req.body.phone,
     };
 
     const validationIssue = validate(req, res, user);
@@ -100,7 +100,7 @@ exports.authentication = async (req, res) => {
 
 const sendMail = async (title, email) => {
   return new Promise((resolve, reject) => {
-    console.log("process.env.DEV_MAIL_API_KEY",process.env.DEV_MAIL_API_KEY)
+    console.log("process.env.DEV_MAIL_API_KEY", process.env.DEV_MAIL_API_KEY)
     const mailgunAuth = {
       auth: {
         api_key: process.env.DEV_MAIL_API_KEY,
